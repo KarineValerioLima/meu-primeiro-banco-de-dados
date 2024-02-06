@@ -28,6 +28,40 @@ app.post('/usuario', async(req, res)=> {
         res.status(500).send(e)
     }
 
+}) 
+
+app.put('/atualizarUsuario/:id', async(req, res) =>{
+    const id = req.params.id
+    const nome = req.body.nome
+
+    try {
+      await firestore.updateDoc(firestore.doc(db,"usuarios", id),{
+        nome: nome,
+      })
+      res.send("Usuario atualizado com sucesso!")  
+    } catch (e) {
+      console.log("Erro ao atualizar usúario:" + e)  
+
+      res.status(500).send("Erro ao atualizar usúario:" + e)
+    }
+})
+
+app.get("/listaUsuarios", async(req, res)=>{
+   
+
+    try {
+        const usuarios = await firestore.getDocs(firestore.collection(db,"usuarios"))
+        const listaUsuarios = usuarios.docs.map(usuario =>({
+            id:usuario.id,
+            ...usuario.data()
+        }))
+
+        res.send(listaUsuarios)
+    } catch (error) {
+        console.log('ocorreu um erro ao pegar os usuarios')
+        res.send(error)
+    }
+
 })
 
 app.listen(3000,function (){
